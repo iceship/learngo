@@ -48,12 +48,17 @@ func writeJobs(jobs []extractedJob) {
 	headers := []string{"Link", "Title", "Location", "Summary"}
 	wErr := w.Write(headers)
 	checkErr(wErr)
-
+	var data [][]string
 	for _, job := range jobs {
 		jobSlice := []string{"https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=" + job.id, job.title, job.location, job.summary}
-		jwErr := w.Write(jobSlice)
-		checkErr(jwErr)
+		data = append(data, jobSlice)
 	}
+	wErr = w.WriteAll(data)
+	checkErr(wErr)
+}
+
+func writeJobDetail(job extractedJob, c chan<- []string) {
+	c <- []string{"https://www.saramin.co.kr/zf_user/jobs/relay/view?isMypage=no&rec_idx=" + job.id, job.title, job.location, job.summary}
 }
 
 func getPage(page int, mainC chan<- []extractedJob) {
